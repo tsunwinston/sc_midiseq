@@ -1,0 +1,128 @@
+TITLE:: MIDISeq
+summary:: A structured text format for quickly creating patterns that generate MIDI notes and control events.
+categories:: Live Coding
+related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+A structured text format designed to streamline the process of creating complex patterns, enabling the generation of MIDI note sequences and control events. This format allows users to easily define musical ideas, automate performance parameters, and integrate seamlessly with MIDI-based workflows.
+
+
+CLASSMETHODS::
+
+METHOD:: enable
+Enabling MIDISeq
+
+ARGUMENT:: midiout
+the MIDIOut instance the patterns send to
+
+
+METHOD:: disable
+Disabling MIDISeq
+
+
+INSTANCEMETHODS::
+
+
+EXAMPLES::
+subsection::Setup
+Before enabling MIDISeq, we will need to run the below setup code to initialize MIDI.
+code::
+(
+MIDIClient.init; //initializing MIDI source and destinations
+m = MIDIOut(0) //choose the desired MIDI destination
+)
+
+MIDISeq.enable(m);//enabling MIDISeq
+::
+
+Use two sets of "@@@" to open typing area for MIDISeq as shown below. Only commands in this area follows MIDISeq's rules. Outside of this, SuperCollider codes will be interpreted normally.
+
+@@@
+
+commands...
+
+@@@
+
+
+You can also use the method "asMIDISeq" on a string.
+
+code::
+"kick 0 36 o--o--o- 0.6".asMIDISeq;
+::
+
+subsection:: Note pattern commands
+
+code::
+kick 0 36 o--o-oo-- 0.6
+::
+table::
+## name || channel || midinote || rhythmic pattern || amplitude
+## kick || 0       || 36       || o-o-oo--         || 0.6
+::
+list::
+##name: name of the pattern
+##channel: MIDI channel to send to
+##midinote: single or multiple MIDI note patterns
+##rhythm: a step sequencer style rhythmic pattern expression (By default, "o" means note on and "-" means rest)
+##amp: amplitude level(s)
+::
+The above command creates a pattern named "kick", which sends a continuous pattern of midi note 36 on channel 0 with a rhythmic pattern of "o-o-oo--", amplitude value is set to 0.6.
+
+Similar to SuperCollider patterns, parameters can use series of values. This applies to channel, midinote, and amp.
+There are a few options to create a pattern:
+code::
+kick 0 36 o--o-oo-- 0.6 //single value
+kick 0 [36,39] o-o-oo-- 0.6 //sequence list pattern
+kick 0 36,37,38,39 o-o-oo-- 0.6 //same as above
+kick 0 r[36,37,38,39] o-o-oo-- 0.6//randomly choosing from the list
+kick 0 xr[36,37,38,39] o-o-oo-- 0.6 //randomly chooing from the list without repetition
+kick 0 shuf[36,37,38,39] o-o-oo-- 0.6//shuffling the list
+kick 0 (36..39) o-o-oo-- 0.6 //same as [36,37,38,39]
+::
+
+Rhythms:
+MIDISeq uses a step sequencer style of rhythmic representation.
+By default, a "o" represents a note on, a "-" represents a note off
+o--o--o-
+
+
+
+
+
+subsection:: Control pattern commands
+
+Shape mode:
+command format as follow:
+name, channel, control number, value range, shape, cycle per bar
+code::
+cutoff 0 60 30-100 ~ 2
+::
+In the above example:
+table::
+## name || channel || control number || value range || shape || cycle per bar
+## cutoff || 0 || 60 || 30-100 || ~ || 2
+::
+
+There are seven available shapes
+table::
+## Shape || Symbol || Description
+## straight || = || Goes up or down in one direction depends on the range value.
+## straightSine || =~ || Same as straight, with a sine interpolation.
+## triangle || tri or ^ || Triangle waveform
+## sine || ~ || Sine waveform
+## square || sqr || Square waveform
+## rand ||    || A repeated random pattern
+## white ||  || A non-repeated random pattern
+::
+
+code::
+cutoff 0 60 30-100 straight 2 // Goes straight from 30-100 2 times a bar
+cutoff 0 60 30-100 = 2 // same as above
+cutoff 0 60 30-100 straightSine 2 //  same as above with a sine wave curve
+cutoff 0 60 30-100 =~ 2 //same as above
+cutoff 0 60 30-100 triangle 2 //Creates an updown / downup pattern
+cutoff 0 60 30-100 ^ 2 // same as the above
+cutoff 0 60 30-100 sine 2 // updown / downup with sine curve
+cutoff 0 60 30-100 ~ 2 // same as the above
+
+::
