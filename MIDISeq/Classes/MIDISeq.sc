@@ -10,7 +10,7 @@ MIDISeq {
 	*enable {
 		arg midiout;
 
-		isRunning = true;
+		isRunning = True;
 		controlPatternRate = 16;
 
 		cleanUpFunc = {|str|
@@ -408,8 +408,6 @@ MIDISeq {
 				Pdef.all.keys.do{|name| Pdef(name).stop};
 				"pattern % stopped".format(name).asCompileString;
 			});
-
-
 		};
 
 		setCommandFunc = {|str|
@@ -443,14 +441,20 @@ MIDISeq {
 		Platform.case(
 			\osx,{
 				preProcessorFunc = {|code|
-					var escapeString, escapeRange, inRange, hasEscape, selectionStart;
+					var documentString, escapeString, escapeRange, inRange, hasEscape, selectionStart;
 					escapeString = "@@@";
-					escapeRange = Document.current.string.findAll(escapeString)[0..1];
-					escapeRange = Document.current.string.findAll(escapeString)[0..1];
-					hasEscape = escapeRange.notNil && (escapeRange.size > 1);
-					selectionStart = Document.current.selectionStart;
-					inRange = (selectionStart > escapeRange[0]) && (selectionStart < escapeRange[1]);
+					hasEscape = false;
 
+					documentString = Document.current.string;
+
+					if("@@@.+\\R+@@@".matchRegexp(documentString),{
+						escapeRange = documentString.findAll(escapeString)[0..1];
+						"escapeRange: %".format(escapeRange).postln;
+
+						hasEscape = escapeRange.notNil && (escapeRange.size.postln > 1);
+						selectionStart = Document.current.selectionStart;
+						inRange = (selectionStart > escapeRange[0]) && (selectionStart < escapeRange[1]);
+					});
 					if(hasEscape && inRange,{
 						mainFunc.value(code);
 					},{
