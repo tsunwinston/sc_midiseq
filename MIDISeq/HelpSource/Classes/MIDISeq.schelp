@@ -4,7 +4,7 @@ categories:: Live Coding
 related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
 
 DESCRIPTION::
-A structured text format designed to streamline the process of creating complex patterns, enabling the generation of MIDI note sequences and control events. This format allows users to easily define musical ideas, automate performance parameters, and integrate seamlessly with MIDI-based workflows.
+A structured text format designed to streamline the process of creating complex patterns, enabling the generation of MIDI note and control message sequences. This format allows users to easily define musical ideas, automate performance parameters, and integrate seamlessly with MIDI-based workflows.
 
 
 CLASSMETHODS::
@@ -40,11 +40,15 @@ There are two ways to use MIDISeq:
 
 1.) (Mac Only) Use two sets of "@@@" to create a typing area for MIDISeq as shown below. Commands within this area follow MIDISeq's rules, while regular SuperCollider code outside of it is interpreted normally.
 
+code::
 @@@
 
-commands...
+kick 0 36 o--o--o- 0.5
+hihat 0 42 o-o-o-o- 0.25
+snare 0 38 `----o--- 0.5
 
 @@@
+::
 
 2.) (Mac and Windows)You can also use the method "asMIDISeq" on a string.
 
@@ -85,15 +89,15 @@ kick 0 36 o--o-oo-- 0.6 //single value
 kick 0 [36,39] o-o-oo-- 0.6 //sequence list pattern
 kick 0 36,37,38,39 o-o-oo-- 0.6 //same as above
 kick 0 r[36,37,38,39] o-o-oo-- 0.6//randomly choosing from the list
-kick 0 xr[36,37,38,39] o-o-oo-- 0.6 //randomly chooing from the list without repetition
+kick 0 xr[36,37,38,39] o-o-oo-- 0.6 //randomly choosing from the list without repetition
 kick 0 shuf[36,37,38,39] o-o-oo-- 0.6//shuffling the list
 kick 0 (36..39) o-o-oo-- 0.6 //same as [36,37,38,39]
 ::
 
 Rhythms:
-MIDISeq uses a step sequencer style of rhythmic representation.
-By default, a "o" represents a note on, a "-" represents a note off
-o--o--o-
+MIDISeq uses a step sequencer style of rhythmic representation. By default, "o" represents a note onset, while "-" represents a continuation of the previous note. For example, "o--o" converts to duration values of [3.0, 1.0].
+
+Adding a backtick "`" before the rhythmic pattern changes how "-" is interpreted. With a backtick, "-" becomes a Rest instead of a continuation. For example, "`o--o" converts to [1.0, Rest, Rest, 1.0].
 
 
 
@@ -103,7 +107,7 @@ subsection:: Control pattern commands
 
 Shape mode:
 command format as follow:
-name, channel, control number, value range, shape, cycle per bar
+name, the keyword "ctl" ,channel, control number, value range, shape, cycle per bar
 code::
 cutoff ctl 0 60 30-100 ~ 2
 ::
@@ -134,5 +138,4 @@ cutoff ctl 0 60 30-100 triangle 2 //Creates an updown / downup pattern
 cutoff ctl 0 60 30-100 ^ 2 // same as the above
 cutoff ctl 0 60 30-100 sine 2 // updown / downup with sine curve
 cutoff ctl 0 60 30-100 ~ 2 // same as the above
-
 ::
