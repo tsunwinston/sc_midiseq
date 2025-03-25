@@ -25,7 +25,7 @@ INSTANCEMETHODS::
 
 EXAMPLES::
 subsection::Setup
-Before enabling MIDISeq, we will need to run the below setup code to initialize MIDI.
+Before using MIDISeq, you must first run the setup code below to initialize MIDIClient and setup a MIDIOut.
 code::
 (
 MIDIClient.init; //initializing MIDI source and destinations
@@ -35,7 +35,10 @@ m = MIDIOut(0) //choose the desired MIDI destination
 MIDISeq.enable(m);//enabling MIDISeq
 ::
 
-Use two sets of "@@@" to open typing area for MIDISeq as shown below. Only commands in this area follows MIDISeq's rules. Outside of this, SuperCollider codes will be interpreted normally.
+There are two ways to use MIDISeq:
+
+
+1.) (Mac Only) Use two sets of "@@@" to create a typing area for MIDISeq as shown below. Commands within this area follow MIDISeq's rules, while regular SuperCollider code outside of it is interpreted normally.
 
 @@@
 
@@ -43,13 +46,20 @@ commands...
 
 @@@
 
-
-You can also use the method "asMIDISeq" on a string.
+2.) (Mac and Windows)You can also use the method "asMIDISeq" on a string.
 
 code::
 "kick 0 36 o--o--o- 0.6".asMIDISeq;
 ::
 
+subsection:: MIDISeq commands:
+
+There are two types of MIDISeq commands:
+
+numberedlist::
+##Note pattern commands: Creates note patterns that send out MIDI note messages.
+##Control pattern commands: Creates control patterns that send out MIDI control messages.
+::
 subsection:: Note pattern commands
 
 code::
@@ -95,7 +105,7 @@ Shape mode:
 command format as follow:
 name, channel, control number, value range, shape, cycle per bar
 code::
-cutoff 0 60 30-100 ~ 2
+cutoff ctl 0 60 30-100 ~ 2
 ::
 In the above example:
 table::
@@ -116,13 +126,13 @@ table::
 ::
 
 code::
-cutoff 0 60 30-100 straight 2 // Goes straight from 30-100 2 times a bar
-cutoff 0 60 30-100 = 2 // same as above
-cutoff 0 60 30-100 straightSine 2 //  same as above with a sine wave curve
-cutoff 0 60 30-100 =~ 2 //same as above
-cutoff 0 60 30-100 triangle 2 //Creates an updown / downup pattern
-cutoff 0 60 30-100 ^ 2 // same as the above
-cutoff 0 60 30-100 sine 2 // updown / downup with sine curve
-cutoff 0 60 30-100 ~ 2 // same as the above
+cutoff ctl 0 60 30-100 straight 2 // Goes straight from 30-100 2 times a bar
+cutoff ctl 0 60 30-100 = 2 // same as above
+cutoff ctl 0 60 30-100 straightSine 2 //  same as above with a sine wave curve
+cutoff ctl 0 60 30-100 =~ 2 //same as above
+cutoff ctl 0 60 30-100 triangle 2 //Creates an updown / downup pattern
+cutoff ctl 0 60 30-100 ^ 2 // same as the above
+cutoff ctl 0 60 30-100 sine 2 // updown / downup with sine curve
+cutoff ctl 0 60 30-100 ~ 2 // same as the above
 
 ::

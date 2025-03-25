@@ -10,7 +10,7 @@ MIDISeq {
 	*enable {
 		arg midiout;
 
-		isRunning = True;
+		isRunning = true;
 		controlPatternRate = 16;
 
 		cleanUpFunc = {|str|
@@ -29,7 +29,7 @@ MIDISeq {
 			{str.beginsWith("set ")}{\set}
 			{str.contains(" ctl ")}{\control}
 			{\note};
-			type.postln;
+			// type.postln;
 		};
 
 		listCmdDict = IdentityDictionary[
@@ -408,6 +408,8 @@ MIDISeq {
 				Pdef.all.keys.do{|name| Pdef(name).stop};
 				"pattern % stopped".format(name).asCompileString;
 			});
+
+
 		};
 
 		setCommandFunc = {|str|
@@ -441,19 +443,20 @@ MIDISeq {
 		Platform.case(
 			\osx,{
 				preProcessorFunc = {|code|
-					var documentString, escapeString, escapeRange, inRange, hasEscape, selectionStart;
+					var documentString, escapeString, escapeRanges, inRange, hasEscape, currentPos;
 					escapeString = "@@@";
-					hasEscape = false;
-
 					documentString = Document.current.string;
-
-					if("@@@.+\\R+@@@".matchRegexp(documentString),{
-						escapeRange = documentString.findAll(escapeString)[0..1];
-						"escapeRange: %".format(escapeRange).postln;
-
-						hasEscape = escapeRange.notNil && (escapeRange.size.postln > 1);
-						selectionStart = Document.current.selectionStart;
-						inRange = (selectionStart > escapeRange[0]) && (selectionStart < escapeRange[1]);
+					currentPos = Document.current.selectionStart;
+					hasEscape = "(\\R|^)@@@\\R+.*\\R+@@@".matchRegexp(documentString);
+					if(hasEscape,{
+						escapeRanges = Document.current.string.findAll("@@@");
+						escapeRanges = (escapeRanges.size/2).asInteger.collect{|i| [escapeRanges[i*2], escapeRanges[i*2+1]]};
+						inRange = false;
+						escapeRanges.do{|range, i|
+							if((currentPos > (range[0]+3)) && (currentPos < range[1]),{
+								inRange = true;
+							});
+						};
 					});
 					if(hasEscape && inRange,{
 						mainFunc.value(code);
@@ -488,7 +491,7 @@ MIDISeq {
 
 +String {
 	asMIDISeq{
-		if (MIDISeq.isRunning,{
+		if (MIDISeq.isRunning.postln,{
 			^MIDISeq.midiseqCmd(this);
 		},{
 			^"MIDISeq is not enabled".error;
@@ -521,7 +524,7 @@ MIDISeq {
 				if(useRestForOffset,{
 					if(normalize,{
 						if(offset > 0,{
-							result = result.insert(0, offset.postln);
+							result = result.insert(0, offset);
 							result = result.normalizeSum*numBeats;
 							result[0] = Rest(result[0]);
 						},{
@@ -558,7 +561,7 @@ MIDISeq {
 				tempArray = barRhythm[0];
 				tempOffset = tempArray.last;
 				tempArray[tempArray.size-1] = tempArray.last - barRhythm[1] + bars[i+1%bars.size][1];
-				tempArray.postln;
+				// tempArray.postln;
 			};
 			^[result.flat,bars[0][1]];
 		})
