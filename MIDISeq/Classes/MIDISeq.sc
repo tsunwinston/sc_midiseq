@@ -561,7 +561,6 @@ MIDISeq {
 				tempArray = barRhythm[0];
 				tempOffset = tempArray.last;
 				tempArray[tempArray.size-1] = tempArray.last - barRhythm[1] + bars[i+1%bars.size][1];
-				// tempArray.postln;
 			};
 			^[result.flat,bars[0][1]];
 		})
